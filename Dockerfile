@@ -7,7 +7,9 @@ ARG CODE_SERVER_VERSION=4.7.0
 ARG BUILD_DATE
 LABEL build_version="Build-date:- ${BUILD_DATE}"
 LABEL maintainer="rayleizhu"
+
 # Install dependencies
+############# NOTE: change the following snippet if you do not need switch the source or need different source ##############
 RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
 echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list && \
 echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list && \
@@ -44,12 +46,14 @@ RUN sed -i "s/# en_US.UTF-8/en_US.UTF-8/" /etc/locale.gen \
 ENV LANG=en_US.UTF-8
 
 # Create project directory
-RUN mkdir /projects
+# RUN mkdir /projects
 
 # Create a non-root user
+ENV PROJECTS_ROOT=/home/coder/projects
 RUN adduser --disabled-password --gecos '' --shell /bin/bash coder \
-  && chown -R coder:coder /projects
-RUN echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-coder
+  && mkdir -p ${PROJECTS_ROOT} \
+  && chown -R coder:coder ${PROJECTS_ROOT} \
+  && echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-coder
 
 # Install fixuid
 ENV ARCH=amd64
@@ -70,7 +74,7 @@ COPY ./entrypoint.sh /usr/bin/entrypoint.sh
 USER coder
 ENV USER=coder
 ENV HOME=/home/coder
-WORKDIR /projects
+WORKDIR ${PROJECTS_ROOT}
 
 EXPOSE 8443
 ENTRYPOINT ["/usr/bin/entrypoint.sh", "--bind-addr", "0.0.0.0:8443", "--cert", "--disable-telemetry", "."]
