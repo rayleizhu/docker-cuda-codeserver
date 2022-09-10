@@ -1,7 +1,23 @@
-FROM nvidia/cuda:11.1-base-ubuntu20.04
+ARG CUDA_VERSION=11.3.0
+ARG OS_RELEASE=ubuntu20.04
+#FROM nvidia/cuda:11.1-base-ubuntu20.04
+FROM nvidia/cuda:${CUDA_VERSION}-devel-${OS_RELEASE}
 
+ARG CODE_SERVER_VERSION=4.7.0
+ARG BUILD_DATE
+LABEL build_version="Build-date:- ${BUILD_DATE}"
+LABEL maintainer="rayleizhu"
 # Install dependencies
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
+echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list && \
+echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list && \
+echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list &&\
+echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list &&\
+echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list &&\
+echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list &&\
+echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list &&\
+echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list &&\
+apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   curl \
   ca-certificates \
   dumb-init \
@@ -37,7 +53,7 @@ RUN echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-coder
 
 # Install fixuid
 ENV ARCH=amd64
-RUN curl -fsSL "https://github.com/boxboat/fixuid/releases/download/v0.4.1/fixuid-0.4.1-linux-$ARCH.tar.gz" | tar -C /usr/local/bin -xzf - && \
+RUN curl -fsSL "https://github.com/boxboat/fixuid/releases/download/v0.4.1/fixuid-0.4.1-linux-${ARCH}.tar.gz" | tar -C /usr/local/bin -xzf - && \
   chown root:root /usr/local/bin/fixuid && \
   chmod 4755 /usr/local/bin/fixuid && \
   mkdir -p /etc/fixuid && \
@@ -45,9 +61,9 @@ RUN curl -fsSL "https://github.com/boxboat/fixuid/releases/download/v0.4.1/fixui
 
 # Install code-server
 WORKDIR /tmp
-ENV CODE_SERVER_VERSION=4.0.1
-RUN curl -fOL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server_${CODE_SERVER_VERSION}_${ARCH}.deb
-RUN dpkg -i ./code-server_${CODE_SERVER_VERSION}_${ARCH}.deb && rm ./code-server_${CODE_SERVER_VERSION}_${ARCH}.deb
+ENV CODE_SERVER_VERSION=${CODE_SERVER_VERSION}
+RUN curl -fOL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server_${CODE_SERVER_VERSION}_${ARCH}.deb && \
+  dpkg -i ./code-server_${CODE_SERVER_VERSION}_${ARCH}.deb && rm ./code-server_${CODE_SERVER_VERSION}_${ARCH}.deb
 COPY ./entrypoint.sh /usr/bin/entrypoint.sh
 
 # Switch to default user
