@@ -56,6 +56,12 @@ $ cat ~/.config/code-server/config.yaml
 
 You can install other packages such as miniconda and pytorch just like on a normal machine. As mentioned above, all modifications under `/home/coder` directory are persistent, so your environment won't lost on restart of Code Server.
 
+### Use your own SSL certificate (optional)
+
+By default, the coder server in the docker image will use self-signed SSL certificate. They are stored at `/home/coder/.local/share/code-server/localhost.[crt, key]`.
+For security concern, you may want to use your own SSL certificate derived from CA such as [Let's Encrypt](https://letsencrypt.org/).
+The simplest way to do this is overriding the two files (`/home/coder/.local/share/code-server/localhost.[crt, key]`) with the real certificate pairs you want.
+
 ## TODO
 - [ ] Solve the "Workspace does not exisit" warning on first login
 - [ ] Use docker compose
