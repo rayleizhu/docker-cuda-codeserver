@@ -1,4 +1,4 @@
-# Docker Code Server with CUDA Development Environment
+# Docker Code Server with CUDA
 
 Code Server Docker image with cuda development env on the browser. By default, it contains:
 - Ubunttu 20.04
