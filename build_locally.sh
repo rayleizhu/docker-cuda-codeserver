@@ -8,8 +8,8 @@
 # curl google.com && \
 docker build -t cuda-code-server:latest . \
 	--build-arg CUDA_VERSION=11.3.0 \
-    --build-arg OS_RELEASE=ubuntu20.04 \
-	--build-arg CODE_SERVER_VERSION=4.7.0 \
+	--build-arg OS_RELEASE=ubuntu20.04 \
+	--build-arg CODE_SERVER_VERSION=4.13.0 \
 	--build-arg BUILD_DATE=$(date +"%Y-%m-%d") \
 	--no-cache \
 	--network host 

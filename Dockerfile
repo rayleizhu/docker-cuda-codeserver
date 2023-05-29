@@ -8,6 +8,7 @@ ARG BUILD_DATE
 LABEL build_version="Build-date:- ${BUILD_DATE}"
 LABEL maintainer="rayleizhu"
 
+
 # Install dependencies
 ############# NOTE: change the following snippet if you do not need switch the source or need different source ##############
 RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
@@ -39,6 +40,9 @@ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install
   python \
   python3-pip \
   python3-opencv \
+  tmux \
+  dvipng texlive-latex-extra texlive-fonts-recommended cm-super \
+  nodejs \
   && rm -rf /var/lib/apt/lists/*
 
 RUN sed -i "s/# en_US.UTF-8/en_US.UTF-8/" /etc/locale.gen \
