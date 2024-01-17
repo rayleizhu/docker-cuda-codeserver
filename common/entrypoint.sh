@@ -17,4 +17,9 @@ if [ "${DOCKER_USER-}" ] && [ "$DOCKER_USER" != "$USER" ]; then
   sudo sed -i "/coder/d" /etc/sudoers.d/nopasswd
 fi
 
-dumb-init /usr/bin/code-server "$@"
+
+# launch code-server if it has been installed
+# https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script
+if command -v /usr/bin/code-server &> /dev/null; then
+  dumb-init /usr/bin/code-server "$@"
+fi

@@ -3,56 +3,28 @@ ARG OS_RELEASE=ubuntu20.04
 #FROM nvidia/cuda:11.1-base-ubuntu20.04
 FROM nvidia/cuda:${CUDA_VERSION}-devel-${OS_RELEASE}
 
+
+# ARG SET_APT_SOURCE=skip -> use official apt source
+ARG SET_APT_SOURCE=tuna
+ARG ENABLE_ALIYUN_DISK=1
+# ARG CODE_SERVER_VERSION=None -> disable installation of codeserver
 ARG CODE_SERVER_VERSION=4.7.0
 ARG BUILD_DATE
+
 LABEL build_version="Build-date:- ${BUILD_DATE}"
 LABEL maintainer="rayleizhu"
 
 
 # Install dependencies
-############# NOTE: change the following snippet if you do not need switch the source or need different source ##############
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
-echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list && \
-echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list && \
-echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list &&\
-echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list &&\
-echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list &&\
-echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list &&\
-echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list &&\
-echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list &&\
-apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-  curl \
-  ca-certificates \
-  dumb-init \
-  htop \
-  sudo \
-  git \
-  bzip2 \
-  libx11-6 \
-  locales \
-  man \
-  nano \
-  git \
-  procps \
-  openssh-client \
-  vim.tiny \
-  lsb-release \
-  python \
-  python3-pip \
-  python3-opencv \
-  tmux \
-  dvipng texlive-latex-extra texlive-fonts-recommended cm-super \
-  nodejs \
-  && rm -rf /var/lib/apt/lists/*
+COPY common/install_basic_tools.sh install_basic_tools.sh
+RUN bash ./install_basic_tools.sh ${SET_APT_SOURCE} && rm install_basic_tools.sh
 
+# set locale
 RUN sed -i "s/# en_US.UTF-8/en_US.UTF-8/" /etc/locale.gen \
   && locale-gen
 ENV LANG=en_US.UTF-8
 
-# Create project directory
-# RUN mkdir /projects
-
-# Create a non-root user
+# Create a non-root user & the project directory
 ENV PROJECTS_ROOT=/home/coder/projects
 RUN adduser --disabled-password --gecos '' --shell /bin/bash coder \
   && mkdir -p ${PROJECTS_ROOT} \
@@ -60,6 +32,8 @@ RUN adduser --disabled-password --gecos '' --shell /bin/bash coder \
   && echo "coder ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-coder
 
 # Install fixuid
+# https://www.kuangstudy.com/bbs/1455772174060093441
+# TODO: find ARCH automatically
 ENV ARCH=amd64
 RUN curl -fsSL "https://github.com/boxboat/fixuid/releases/download/v0.4.1/fixuid-0.4.1-linux-${ARCH}.tar.gz" | tar -C /usr/local/bin -xzf - && \
   chown root:root /usr/local/bin/fixuid && \
@@ -68,11 +42,15 @@ RUN curl -fsSL "https://github.com/boxboat/fixuid/releases/download/v0.4.1/fixui
   printf "user: coder\ngroup: coder\n" > /etc/fixuid/config.yml
 
 # Install code-server
-WORKDIR /tmp
-ENV CODE_SERVER_VERSION=${CODE_SERVER_VERSION}
-RUN curl -fOL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server_${CODE_SERVER_VERSION}_${ARCH}.deb && \
-  dpkg -i ./code-server_${CODE_SERVER_VERSION}_${ARCH}.deb && rm ./code-server_${CODE_SERVER_VERSION}_${ARCH}.deb
-COPY ./entrypoint.sh /usr/bin/entrypoint.sh
+COPY common/install_code_server.sh install_code_server.sh 
+RUN bash ./install_code_server.sh ${CODE_SERVER_VERSION} ${ARCH} && rm install_code_server.sh
+
+# copy entrypoint script
+COPY common/entrypoint.sh /usr/bin/entrypoint.sh
+
+# install aliyunpan
+COPY common/install_aliyun_disk.sh install_aliyun_disk.sh
+RUN bash ./install_aliyun_disk.sh ${ENABLE_ALIYUN_DISK} && rm install_aliyun_disk.sh
 
 # Switch to default user
 USER coder
