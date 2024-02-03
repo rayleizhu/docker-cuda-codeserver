@@ -65,3 +65,8 @@ The simplest way to do this is overriding the two files (`/home/coder/.local/sha
 ## TODO
 - [ ] Solve the "Workspace does not exisit" warning on first login
 - [ ] Use docker compose
+
+## References
+
+- [coder/code-server: ipv6 support #261](https://github.com/coder/code-server/issues/261)
+- [6 张图详解 Docker 容器网络配置](https://zhuanlan.zhihu.com/p/554015619)
