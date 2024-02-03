@@ -58,5 +58,11 @@ ENV USER=coder
 ENV HOME=/home/coder
 WORKDIR ${PROJECTS_ROOT}
 
+# use /home/coder/.config/code-server/config.yaml to config the launch paramters
+# cat ~/.config/code-server/config.yaml 
+#   bind-addr: "[::]:8443"
+#   auth: password
+#   password: [your password] 
+#   cert: true
 EXPOSE 8443
-ENTRYPOINT ["/usr/bin/entrypoint.sh", "--bind-addr", "0.0.0.0:8443", "--cert", "--disable-telemetry", "."]
+ENTRYPOINT ["/usr/bin/entrypoint.sh", "--disable-telemetry", "."]

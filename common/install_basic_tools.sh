@@ -15,6 +15,8 @@ set_apt_source_tuna() {
 }
 
 install_base() {
+  # https://devicetests.com/accept-microsoft-eula-ubuntu
+  echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections && \
   apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   curl \
   ca-certificates \
@@ -23,6 +25,8 @@ install_base() {
   sudo \
   git \
   git-lfs \
+  net-tools \
+  ttf-mscorefonts-installer \
   wget \
   bzip2 \
   libx11-6 \
