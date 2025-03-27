@@ -64,5 +64,9 @@ WORKDIR ${PROJECTS_ROOT}
 #   auth: password
 #   password: [your password] 
 #   cert: true
-EXPOSE 8443
-ENTRYPOINT ["/usr/bin/entrypoint.sh", "--disable-telemetry", "."]
+# dumb-init: https://github.com/Yelp/dumb-init, let it be the PID 1 process to manage signal handling
+# and orphan processes in container
+# it seems that we no longer need dumb-init now: https://stackoverflow.com/a/77579291
+EXPOSE 8443 22
+ENTRYPOINT ["/usr/bin/dumb-init", "--"] 
+CMD ["/usr/bin/entrypoint.sh", "--disable-telemetry", "."]

@@ -36,6 +36,7 @@ install_base() {
   git \
   procps \
   openssh-client \
+  openssh-server \
   vim.tiny \
   lsb-release \
   python \

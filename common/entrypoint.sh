@@ -18,8 +18,14 @@ if [ "${DOCKER_USER-}" ] && [ "$DOCKER_USER" != "$USER" ]; then
 fi
 
 
+if command -v /usr/sbin/sshd &> /dev/null; then
+  sudo service ssh start # start sshd as daemon in the background
+fi
+
 # launch code-server if it has been installed
 # https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script
 if command -v /usr/bin/code-server &> /dev/null; then
-  dumb-init /usr/bin/code-server "$@"
+  /usr/bin/code-server "$@"
+else # we need at least one active foreground process to keep the container alive
+  /bin/bash
 fi
