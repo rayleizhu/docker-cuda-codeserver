@@ -1,7 +1,6 @@
 ARG CUDA_VERSION=11.3.0
 ARG OS_RELEASE=ubuntu20.04
 #FROM nvidia/cuda:11.1-base-ubuntu20.04
-FROM gcr.io/kaniko-project/executor:v1.24.0-debug AS kaniko
 FROM nvcr.io/nvidia/cuda:${CUDA_VERSION}-devel-${OS_RELEASE}
 
 
@@ -48,14 +47,6 @@ COPY common/entrypoint.sh /usr/bin/entrypoint.sh
 # install aliyunpan
 COPY common/install_aliyun_disk.sh install_aliyun_disk.sh
 RUN bash ./install_aliyun_disk.sh ${ENABLE_ALIYUN_DISK} && rm install_aliyun_disk.sh
-
-# Add Kaniko executor for daemonless image build in low-privilege environments
-COPY --from=kaniko /kaniko/executor /usr/local/bin/kaniko-executor
-COPY --from=kaniko /kaniko/ssl/certs/ /kaniko/ssl/certs/
-RUN chmod +x /usr/local/bin/kaniko-executor \
-  && mkdir -p /kaniko/.docker /workspace \
-  && chown -R coder:coder /kaniko /workspace
-ENV SSL_CERT_DIR=/kaniko/ssl/certs
 
 # Switch to default user
 USER coder
