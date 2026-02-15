@@ -8,6 +8,14 @@ Code Server Docker image with cuda development env on the browser. By default, i
 Modfied from [works-on-my-machine/pytorch-code-server](https://github.com/works-on-my-machine/pytorch-code-server).
 
 
+## News
+
+The latest version of this image is available on [Aliyun Container Registry](https://cr.console.aliyun.com/repository/cn-shenzhen/rayleizhu/cuda-codeserver-v2/details). You can pull the image by
+
+```
+docker pull crpi-ouxc4bme22uzjqls.cn-shenzhen.personal.cr.aliyuncs.com/rayleizhu/cuda-codeserver-v2:latest
+```
+
 ## Requirements
 - CUDA device with compute capability 3.5 or higher
 - [NVIDIA Docker Toolkit](https://github.com/ghokun/nvidia-docker-host)
