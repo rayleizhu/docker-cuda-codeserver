@@ -56,49 +56,6 @@ $ cat ~/.config/code-server/config.yaml
 
 You can install other packages such as miniconda and pytorch just like on a normal machine. As mentioned above, all modifications under `/home/coder` directory are persistent, so your environment won't lost on restart of Code Server.
 
-### Build container images inside this container (low privilege)
-
-Use `build_image_kaniko.sh` in unprivileged containers.
-
-1. Build in-container with `kaniko` and export a local tar (no push):
-
-```bash
-KANIKO_NO_PUSH=1 bash build_image_kaniko.sh
-```
-
-Output tar location (default):
-
-```bash
-build/cuda-codeserver-v2_<tag>.tar
-```
-
-2. If you need to push to registry, prepare registry auth file in the running container:
-
-```bash
-mkdir -p /kaniko/.docker
-cat > /kaniko/.docker/config.json <<'EOF'
-{
-	"auths": {
-		"<your-registry>": {
-			"auth": "<base64(username:password)>"
-		}
-	}
-}
-EOF
-```
-
-3. Build and push with `kaniko`:
-
-```bash
-export DESTINATION_IMAGE=<your-registry>/<namespace>/<image>:<tag>
-export CACHE=true
-export CACHE_REPO=<your-registry>/<namespace>/kaniko-cache
-KANIKO_NO_PUSH=0 bash build_image_kaniko.sh
-```
-
-Optional:
-- add proxy envs before build: `export HTTP_PROXY=... HTTPS_PROXY=... NO_PROXY=...`
-
 ### Use your own SSL certificate (optional)
 
 By default, the coder server in the docker image will use self-signed SSL certificate. They are stored at `/home/coder/.local/share/code-server/localhost.[crt, key]`.
