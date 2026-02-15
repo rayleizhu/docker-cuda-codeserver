@@ -1,4 +1,7 @@
-# Docker Code Server with CUDA
+<h1>
+	<img src="assets/icon.png" alt="Project icon" width="48" style="vertical-align: middle; margin-right: 8px;" />
+	Docker Code Server with CUDA
+</h1>
 
 Code Server Docker image with cuda development env on the browser. By default, it contains:
 - Ubunttu 20.04
