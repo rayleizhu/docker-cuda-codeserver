@@ -3,11 +3,14 @@
 set -ex
 
 install_() {
+    # Install aliyunpan from tickstep repository
+    # Reference: https://github.com/tickstep/aliyunpan
+    
     curl -fsSL http://file.tickstep.com/apt/pgp | gpg --dearmor | \
-    tee /etc/apt/trusted.gpg.d/tickstep-packages-archive-keyring.gpg > /dev/null && \
+    sudo tee /etc/apt/trusted.gpg.d/tickstep-packages-archive-keyring.gpg > /dev/null && \
     echo "deb [signed-by=/etc/apt/trusted.gpg.d/tickstep-packages-archive-keyring.gpg arch=amd64,arm64] http://file.tickstep.com/apt aliyunpan main" | \
-    tee /etc/apt/sources.list.d/tickstep-aliyunpan.list > /dev/null && \
-    apt-get update && sudo apt-get install -y aliyunpan
+    sudo tee /etc/apt/sources.list.d/tickstep-aliyunpan.list > /dev/null && \
+    sudo apt-get update && sudo apt-get install -y aliyunpan
 }
 
 

@@ -3,21 +3,18 @@
 set -ex
 
 set_apt_source_tuna() {
-  mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
-  echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list && \
-  echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse' >> /etc/apt/sources.list && \
-  echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list &&\
-  echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list &&\
-  echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list &&\
-  echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse' >> /etc/apt/sources.list &&\
-  echo 'deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list &&\
-  echo '# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse' >> /etc/apt/sources.list
+  # Backup & Replace official sources with TUNA mirror (works for any ubuntu release)
+  cp /etc/apt/sources.list /etc/apt/sources.list.bak &&\
+  sed -i "s@http://.*archive.ubuntu.com@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list &&\
+  sed -i "s@http://.*security.ubuntu.com@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
 }
 
 install_base() {
+  # Ensure ca-certificates is installed for https sources
   # https://devicetests.com/accept-microsoft-eula-ubuntu
+  apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
   echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections && \
-  apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   curl \
   ca-certificates \
   dumb-init \
@@ -33,18 +30,14 @@ install_base() {
   locales \
   man \
   nano \
-  git \
   procps \
   openssh-client \
   openssh-server \
-  vim.tiny \
+  vim \
   lsb-release \
-  python \
-  python3-pip \
-  python3-opencv \
   tmux \
-  dvipng texlive-latex-extra texlive-fonts-recommended cm-super \
   nodejs \
+  dvipng texlive-latex-extra texlive-fonts-recommended cm-super \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 }
 
